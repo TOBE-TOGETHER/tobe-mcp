@@ -1,5 +1,5 @@
 from mcp.server.fastmcp import FastMCP
-
+from mcp.types import Message
 from src.logger import get_logger
 
 def ui_designer_prompt(mcp: FastMCP):
@@ -13,10 +13,13 @@ def ui_designer_prompt(mcp: FastMCP):
         You have deep knowledge of typography, color theory, layout principles, responsive design, and user-centered design methodologies.
         """
 
-    @mcp.prompt("UIdesign")
-    def ui_design(requirements: str) -> str:
+    @mcp.prompt(
+         name="ui_design",
+         description="Create a comprehensive UI design solution"
+      )
+    def ui_design(requirements: str) -> list[Message]:
         logger.info(f"Creating UI design prototype and DRD for the following requirements: {requirements}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create a comprehensive UI design solution to meet the following requirements:
             {requirements}
@@ -71,12 +74,17 @@ def ui_designer_prompt(mcp: FastMCP):
             - Use modern design patterns and best practices
             - Provide specific measurements and color codes
             - Include interactive states and micro-interactions
-        """
+        """), Message(role="user", content=f"""
+            Requirements: {requirements}
+        """)]
     
-    @mcp.prompt("design_system")
-    def design_system(project_name: str, brand_guidelines: str = "") -> str:
+    @mcp.prompt(
+         name="design_system",
+         description="Create a comprehensive design system"
+      )
+    def design_system(project_name: str, brand_guidelines: str = "") -> list[Message]:
         logger.info(f"Creating design system for project: {project_name}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create a comprehensive design system for the project: {project_name}
             
@@ -119,12 +127,18 @@ def ui_designer_prompt(mcp: FastMCP):
                - Icon library specifications
                - Image and illustration guidelines
                - Animation specifications
-        """
+        """), Message(role="user", content=f"""
+            Project Name: {project_name}
+            Brand Guidelines: {brand_guidelines}
+        """)]
     
-    @mcp.prompt("accessibility_audit")
-    def accessibility_audit(design_description: str) -> str:
+    @mcp.prompt(
+         name="accessibility_audit",
+         description="Conduct a comprehensive accessibility audit"
+      )
+    def accessibility_audit(design_description: str) -> list[Message]:
         logger.info(f"Conducting accessibility audit for design: {design_description}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to conduct a comprehensive accessibility audit for the following design:
             {design_description}
@@ -166,4 +180,6 @@ def ui_designer_prompt(mcp: FastMCP):
                - Priority fixes (critical, high, medium, low)
                - Implementation recommendations
                - Testing strategies and tools
-        """ 
+        """), Message(role="user", content=f"""
+            Design Description: {design_description}
+        """)]

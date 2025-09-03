@@ -1,5 +1,5 @@
 from mcp.server.fastmcp import FastMCP
-from mcp.types import Message
+from mcp.server.fastmcp.prompts.base import Message
 from src.logger import get_logger
 
 def ui_designer_prompt(mcp: FastMCP):

@@ -1,5 +1,5 @@
 from mcp.server.fastmcp import FastMCP
-
+from mcp.server.fastmcp.prompts.base import Message
 from src.logger import get_logger
 
 def english_teacher_prompt(mcp: FastMCP):
@@ -14,11 +14,13 @@ def english_teacher_prompt(mcp: FastMCP):
         You specialize in creating engaging, progressive, and culturally relevant English learning content for learners of all levels.
         """
 
-    @mcp.prompt("word_lesson")
-    def word_lesson(word: str, context: str = "") -> str:
+    @mcp.prompt(
+         name="word_lesson",
+         description="Create a detailed word lesson"
+      )
+    def word_lesson(word: str, context: str = "") -> list[Message]:
         logger.info(f"Creating detailed word lesson for: {word}")
-        print(f"Creating detailed word lesson for: {word}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create a comprehensive word lesson for the word: "{word}"
             {f"Context: {context}" if context else ""}
@@ -69,13 +71,18 @@ def english_teacher_prompt(mcp: FastMCP):
             - Make the content engaging and memorable
             - Consider the learner's level (adjust complexity accordingly)
             - Include cultural context and usage tips in English and Chinese
-        """
+        """), Message(role="user", content=f"""
+            Word: {word}
+            Context: {context}
+        """)]
     
-    @mcp.prompt("vocabulary_builder")
-    def vocabulary_builder(topic: str, level: str = "intermediate", word_count: int = 10) -> str:
+    @mcp.prompt(
+         name="vocabulary_builder",
+         description="Create a comprehensive vocabulary lesson"
+      )
+    def vocabulary_builder(topic: str, level: str = "intermediate", word_count: int = 10) -> list[Message]:
         logger.info(f"Creating vocabulary builder for topic: {topic}, level: {level}")
-        print(f"Creating vocabulary builder for topic: {topic}, level: {level}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create a comprehensive vocabulary lesson for the topic: "{topic}"
             Level: {level}
@@ -122,13 +129,19 @@ def english_teacher_prompt(mcp: FastMCP):
                - **Listening Practice**: [Podcasts/videos]
                - **Real-world Application**: [How to use in daily life]
                - **Further Study**: [Advanced vocabulary for next level]
-        """
+        """), Message(role="user", content=f"""
+            Topic: {topic}
+            Level: {level}
+            Word Count: {word_count}
+        """)]
     
-    @mcp.prompt("conversation_practice")
-    def conversation_practice(scenario: str, level: str = "intermediate", participants: int = 2) -> str:
+    @mcp.prompt(
+         name="conversation_practice",
+         description="Create a conversation practice session"
+      )
+    def conversation_practice(scenario: str, level: str = "intermediate", participants: int = 2) -> list[Message]:
         logger.info(f"Creating conversation practice for scenario: {scenario}")
-        print(f"Creating conversation practice for scenario: {scenario}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create a conversation practice session for the scenario: "{scenario}"
             Level: {level}
@@ -177,13 +190,19 @@ def english_teacher_prompt(mcp: FastMCP):
                - **Related Scenarios**: [Similar situations to practice]
                - **Writing Follow-up**: [Email, text, or letter related to scenario]
                - **Real-world Application**: [How to use in actual situations]
-        """
+        """), Message(role="user", content=f"""
+            Scenario: {scenario}
+            Level: {level}
+            Participants: {participants}
+        """)]
     
-    @mcp.prompt("reading_comprehension")
-    def reading_comprehension(topic: str, level: str = "intermediate", text_length: str = "medium") -> str:
+    @mcp.prompt(
+         name="reading_comprehension",
+         description="Create a reading comprehension lesson"
+      )
+    def reading_comprehension(topic: str, level: str = "intermediate", text_length: str = "medium") -> list[Message]:
         logger.info(f"Creating reading comprehension for topic: {topic}")
-        print(f"Creating reading comprehension for topic: {topic}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create a reading comprehension lesson for the topic: "{topic}"
             Level: {level}
@@ -231,4 +250,8 @@ def english_teacher_prompt(mcp: FastMCP):
                - **For Lower Levels**: [Simplified versions or support]
                - **For Higher Levels**: [Extension activities]
                - **Multiple Intelligences**: [Different learning styles]
-        """
+        """), Message(role="user", content=f"""
+            Topic: {topic}
+            Level: {level}
+            Text Length: {text_length}
+        """)]

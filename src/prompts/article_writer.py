@@ -1,5 +1,5 @@
 from mcp.server.fastmcp import FastMCP
-
+from mcp.server.fastmcp.prompts.base import Message
 from src.logger import get_logger
 
 def article_writer_prompt(mcp: FastMCP):
@@ -13,22 +13,16 @@ def article_writer_prompt(mcp: FastMCP):
         You have deep knowledge of content marketing, audience engagement, readability optimization, and effective communication strategies.
         You specialize in creating high-quality, SEO-friendly content that resonates with target audiences across different cultures and languages.
         """
-    self_introduction = "I'm Alex, your professional article writer. How can I help you create compelling content today?"
 
-    @mcp.prompt("article_generator")
-    def article_generator(draft_idea: str, language: str = "english", article_type: str = "blog", target_audience: str = "general", word_count: int = 800) -> str:
+    @mcp.prompt(
+         name="article_generator",
+         description="Generate an article based on a draft idea"
+      )
+    def article_generator(draft_idea: str, language: str = "english", article_type: str = "blog", target_audience: str = "general", word_count: int = 800) -> list[Message]:
         logger.info(f"Generating article for draft idea: {draft_idea}, language: {language}, type: {article_type}")
-        print(f"Generating article for draft idea: {draft_idea}, language: {language}, type: {article_type}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
-            You are required to create a comprehensive article based on the draft idea: "{draft_idea}"
-            Language: {language}
-            Article Type: {article_type}
-            Target Audience: {target_audience}
-            Target Word Count: {word_count}
-            
             Please provide the following:
-            
             1. **Article Overview:**
                - **Title**: [Engaging, SEO-friendly title]
                - **Meta Description**: [Brief summary for search engines]
@@ -79,13 +73,21 @@ def article_writer_prompt(mcp: FastMCP):
             - Optimize for both human readers and search engines
             - Maintain consistent tone and style throughout
             - Consider cultural nuances when writing in different languages
-        """
+        """), Message(role="user", content=f"""
+            Draft Idea: {draft_idea}
+            Language: {language}
+            Article Type: {article_type}
+            Target Audience: {target_audience}
+            Target Word Count: {word_count}
+        """)]
     
-    @mcp.prompt("content_outline")
-    def content_outline(topic: str, content_type: str = "article", target_length: str = "medium", audience: str = "general") -> str:
+    @mcp.prompt(
+         name="content_outline",
+         description="Create a detailed content outline for a topic"
+      )
+    def content_outline(topic: str, content_type: str = "article", target_length: str = "medium", audience: str = "general") -> list[Message]:
         logger.info(f"Creating content outline for topic: {topic}, type: {content_type}")
-        print(f"Creating content outline for topic: {topic}, type: {content_type}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create a detailed content outline for the topic: "{topic}"
             Content Type: {content_type}
@@ -135,13 +137,20 @@ def article_writer_prompt(mcp: FastMCP):
                - **Writing Phase**: [Estimated writing time]
                - **Review Phase**: [Editing and revision time]
                - **Publication Timeline**: [When to publish]
-        """
+        """), Message(role="user", content=f"""
+            Topic: {topic}
+            Content Type: {content_type}
+            Target Length: {target_length}
+            Target Audience: {audience}
+        """)]
     
-    @mcp.prompt("article_editor")
-    def article_editor(article_content: str, editing_focus: str = "general", target_audience: str = "general") -> str:
+    @mcp.prompt(
+         name="article_editor",
+         description="Edit and improve an article"
+      )
+    def article_editor(article_content: str, editing_focus: str = "general", target_audience: str = "general") -> list[Message]:
         logger.info(f"Editing article with focus: {editing_focus}")
-        print(f"Editing article with focus: {editing_focus}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to edit and improve the following article content:
             
@@ -194,13 +203,19 @@ def article_writer_prompt(mcp: FastMCP):
                - **Optional Improvements**: [Nice-to-have enhancements]
                - **Follow-up Content**: [Related articles to write]
                - **Performance Tracking**: [How to measure success]
-        """
+        """), Message(role="user", content=f"""
+            Article Content: {article_content}
+            Editing Focus: {editing_focus}
+            Target Audience: {target_audience}
+        """)]
     
-    @mcp.prompt("multilingual_content")
-    def multilingual_content(original_content: str, target_language: str, cultural_context: str = "") -> str:
+    @mcp.prompt(
+         name="multilingual_content",
+         description="Create multilingual content"
+      )
+    def multilingual_content(original_content: str, target_language: str, cultural_context: str = "") -> list[Message]:
         logger.info(f"Creating multilingual content for language: {target_language}")
-        print(f"Creating multilingual content for language: {target_language}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to create multilingual content based on the original content:
             
@@ -253,13 +268,19 @@ def article_writer_prompt(mcp: FastMCP):
                - **Social Media**: [Platforms popular in target region]
                - **Email Marketing**: [Local email preferences]
                - **Partnership Opportunities**: [Local collaboration possibilities]
-        """
+        """), Message(role="user", content=f"""
+            Original Content: {original_content}
+            Target Language: {target_language}
+            Cultural Context: {cultural_context if cultural_context else "General"}
+        """)]
     
-    @mcp.prompt("seo_optimization")
-    def seo_optimization(content: str, target_keywords: str, content_type: str = "article") -> str:
+    @mcp.prompt(
+         name="seo_optimization",
+         description="Optimize content for SEO"
+      )
+    def seo_optimization(content: str, target_keywords: str, content_type: str = "article") -> list[Message]:
         logger.info(f"Optimizing content for SEO with keywords: {target_keywords}")
-        print(f"Optimizing content for SEO with keywords: {target_keywords}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to optimize the following content for search engines:
             
@@ -317,13 +338,18 @@ def article_writer_prompt(mcp: FastMCP):
                - **Analytics Setup**: [How to track performance]
                - **A/B Testing**: [Content optimization testing]
                - **ROI Measurement**: [Return on content investment]
-        """
-    
-    @mcp.prompt("content_analysis")
-    def content_analysis(content: str, analysis_type: str = "comprehensive") -> str:
+        """), Message(role="user", content=f"""
+            Content: {content}
+            Target Keywords: {target_keywords}
+            Content Type: {content_type}
+        """)]
+
+    @mcp.prompt(
+         name="content_analysis",
+         description="Analyze content")
+    def content_analysis(content: str, analysis_type: str = "comprehensive") -> list[Message]:
         logger.info(f"Analyzing content with type: {analysis_type}")
-        print(f"Analyzing content with type: {analysis_type}")
-        return f"""
+        return [Message(role="system", content=f"""
             {role_profile}
             You are required to analyze the following content:
             
@@ -382,4 +408,7 @@ def article_writer_prompt(mcp: FastMCP):
                - **Content Expansion**: [Additional topics to cover]
                - **Distribution Optimization**: [Better promotion strategies]
                - **Performance Monitoring**: [Metrics to track]
-        """ 
+         """), Message(role="user", content=f"""
+            Content: {content}
+            Analysis Type: {analysis_type}
+        """)]
